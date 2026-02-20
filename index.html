@@ -32,31 +32,26 @@
         .upload-label { font-size: 0.7rem; font-weight: bold; color: var(--rose); display: block; margin-bottom: 5px; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
 
-        /* Certificate Styling - Matches your screenshot */
-        #cert-wrap { width: 800px; height: 600px; background: #fffcf9; border: 12px double var(--gold); padding: 20px; display: none; position: absolute; left: -9999px; box-sizing: border-box; }
-        .cert-inner { border: 1px solid var(--gold); height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 40px; box-sizing: border-box; position: relative; }
+        /* Certificate Layout */
+        #cert-wrap { width: 1000px; height: 750px; background: #fffcf9; border: 15px double var(--gold); padding: 30px; display: none; position: absolute; left: -9999px; box-sizing: border-box; }
+        .cert-inner { border: 2px solid var(--gold); height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 50px; box-sizing: border-box; background: white; }
         
-        .cert-main-row { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: 20px; }
-        .frame { width: 160px; height: 160px; border-radius: 50%; background: #e0e0e0; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .cert-main-row { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+        .frame { width: 180px; height: 180px; border-radius: 50%; background: #f0f0f0; overflow: hidden; border: 4px solid var(--white); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .frame img { width: 100%; height: 100%; object-fit: cover; }
 
-        .cert-text { text-align: center; flex: 1; padding: 0 20px; }
-        .cert-text p { font-size: 0.9rem; line-height: 1.5; color: #444; }
+        .cert-text { text-align: center; flex: 1; padding: 0 30px; }
+        #final-vows { font-family: 'Cormorant Garamond', serif; font-style: italic; color: #555; line-height: 1.6; }
 
-        .sig-container { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; padding: 0 20px; }
-        .sig-box { text-align: center; width: 200px; }
-        .sig-box img { max-width: 150px; max-height: 60px; filter: grayscale(1) contrast(1.2); mix-blend-mode: multiply; }
-        .sig-line { border-top: 1px solid #ccc; margin-top: 5px; font-size: 0.65rem; color: #888; text-transform: uppercase; }
+        .sig-container { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; margin-top: 40px; }
+        .sig-box { text-align: center; width: 250px; }
+        .sig-box img { max-width: 200px; max-height: 80px; filter: contrast(1.5) grayscale(1); mix-blend-mode: multiply; }
+        .sig-line { border-top: 1px solid var(--gold); margin-top: 10px; font-size: 0.8rem; color: var(--gold); text-transform: uppercase; padding-top: 5px; }
 
-        #loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); z-index: 10000; flex-direction: column; align-items: center; justify-content: center; }
+        #loading-msg { display: none; color: var(--rose); font-weight: bold; margin-top: 10px; }
     </style>
 </head>
 <body>
-
-    <div id="loading-overlay">
-        <h1>Creating Magic...</h1>
-        <p>Preparing your certificate</p>
-    </div>
 
     <div id="p1" class="page active">
         <h1>Welcome</h1>
@@ -68,7 +63,7 @@
         <h2>The Couple</h2>
         <input type="text" id="name1" placeholder="Your Full Name">
         <input type="text" id="name2" placeholder="Partner's Full Name">
-        <input type="email" id="myEmail" placeholder="Your Email (for notification)">
+        <input type="email" id="myEmail" placeholder="Your Email">
         
         <div class="upload-section">
             <span class="upload-label">Profile Photos</span>
@@ -76,7 +71,7 @@
                 <input type="file" accept="image/*" onchange="preview(this, 'v1')">
                 <input type="file" accept="image/*" onchange="preview(this, 'v2')">
             </div>
-            <span class="upload-label">Paper Signatures</span>
+            <span class="upload-label">Signatures (Paper Photo)</span>
             <div class="grid-2">
                 <input type="file" accept="image/*" onchange="preview(this, 'sig1')">
                 <input type="file" accept="image/*" onchange="preview(this, 'sig2')">
@@ -87,62 +82,63 @@
 
     <div id="p3" class="page">
         <h2>Your Vows</h2>
-        <textarea id="proposalMsg" rows="6" placeholder="Your message of love..."></textarea>
+        <textarea id="proposalMsg" rows="5" placeholder="Share your heartfelt message..."></textarea>
         <button class="btn" onclick="showPage('p4')">Next</button>
     </div>
 
     <div id="p4" class="page">
-        <h2>Send Proposal</h2>
-        <input type="email" id="email2" placeholder="Partner's Email Address">
-        <button class="btn" onclick="sendProposal()">Send Proposal</button>
+        <h2>Finish & Send</h2>
+        <input type="email" id="email2" placeholder="Partner's Email">
+        <button class="btn" onclick="sendProposal()">Send to Partner</button>
     </div>
 
     <div id="p-waiting" class="page">
         <h1>Sent! ❤️</h1>
-        <p>Waiting for partner to accept...</p>
+        <p>Awaiting partner signature...</p>
     </div>
 
     <div id="p5" class="page">
-        <h1 id="partner-heading">For You</h1>
-        <p id="proposal-display" style="background: #fffcf9; padding: 15px; border-radius: 10px; border: 1px solid var(--pink); font-size: 0.85rem;"></p>
-        <textarea id="vows" rows="4" placeholder="Your response/vows..."></textarea>
-        <button class="btn" onclick="partnerAccepts()">Accept Proposal ❤️</button>
+        <h1>Accept Proposal</h1>
+        <p id="proposal-display" style="font-style: italic;"></p>
+        <textarea id="vows" rows="4" placeholder="Your vows..."></textarea>
+        <button class="btn" onclick="partnerAccepts()">Sign & Accept ❤️</button>
     </div>
 
     <div id="p6" class="page">
         <h1>Official!</h1>
-        <p>Your certificate is ready for download.</p>
-        <button class="btn" onclick="download()">Download PNG Certificate</button>
+        <p>Your certificate is ready.</p>
+        <button class="btn" id="dl-btn" onclick="download()">Download PNG</button>
+        <div id="loading-msg">Processing image... Please wait.</div>
     </div>
 
     <div id="cert-wrap">
         <div class="cert-inner">
             <div style="text-align: center;">
-                <p style="letter-spacing: 5px; color: var(--gold); font-size: 0.75rem; margin: 0;">ESTABLISHED IN LOVE</p>
-                <h1 style="font-size: 3.5rem; margin: 10px 0; font-family: 'Monsieur La Doulaise', cursive;">Marriage License</h1>
+                <p style="letter-spacing: 8px; color: var(--gold); font-size: 0.9rem; margin: 0;">ESTABLISHED IN LOVE</p>
+                <h1 style="font-size: 4.5rem; margin: 15px 0; font-family: 'Monsieur La Doulaise', cursive;">Marriage License</h1>
             </div>
 
             <div class="cert-main-row">
                 <div class="frame"><img id="v1" src=""></div>
                 <div class="cert-text">
-                    <h2 id="final-names" style="font-size: 2.2rem; color: #333; margin-bottom: 15px;"></h2>
+                    <h2 id="final-names" style="font-size: 2.5rem; color: #333; margin-bottom: 20px;"></h2>
                     <p id="final-vows"></p>
                 </div>
                 <div class="frame"><img id="v2" src=""></div>
             </div>
 
-            <div style="text-align: center; margin-top: 20px;">
-                <div style="font-family: 'Monsieur La Doulaise', cursive; font-size: 2.5rem; color: var(--rose);">Infinite Love</div>
+            <div style="text-align: center; margin-top: 30px;">
+                <div style="font-family: 'Monsieur La Doulaise', cursive; font-size: 3rem; color: var(--rose);">Infinite Love</div>
             </div>
 
             <div class="sig-container">
                 <div class="sig-box">
                     <img id="sig1" src="">
-                    <div class="sig-line" id="sig-label-1">Signature</div>
+                    <div class="sig-line" id="sig-label-1">SIGNATURE</div>
                 </div>
                 <div class="sig-box">
                     <img id="sig2" src="">
-                    <div class="sig-line" id="sig-label-2">Signature</div>
+                    <div class="sig-line" id="sig-label-2">SIGNATURE</div>
                 </div>
             </div>
         </div>
@@ -156,13 +152,13 @@
             document.getElementById(id).classList.add('active');
         }
 
+        // Improved Preview: Uses modern Image object to ensure the data is loaded
         function preview(input, imgId) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const img = document.getElementById(imgId);
                     img.src = e.target.result;
-                    img.onload = () => console.log(imgId + " loaded");
                 };
                 reader.readAsDataURL(input.files[0]);
             }
@@ -187,18 +183,16 @@
                 document.getElementById('name1').value = params.get('n1');
                 document.getElementById('name2').value = params.get('n2');
                 document.getElementById('proposal-display').innerText = params.get('msg');
-                document.getElementById('partner-heading').innerText = `For ${params.get('n2')}`;
                 showPage('p5');
             }
         };
 
         function partnerAccepts() {
             const params = new URLSearchParams(window.location.search);
-            const ownerEmail = params.get('owner');
             const partnerVows = document.getElementById('vows').value;
 
             document.getElementById('final-names').innerText = `${params.get('n1')} & ${params.get('n2')}`;
-            document.getElementById('final-vows').innerText = document.getElementById('proposalMsg').value || partnerVows;
+            document.getElementById('final-vows').innerText = partnerVows || params.get('msg');
             document.getElementById('sig-label-1').innerText = params.get('n1');
             document.getElementById('sig-label-2').innerText = params.get('n2');
             
@@ -206,28 +200,34 @@
         }
 
         async function download() {
-            const overlay = document.getElementById('loading-overlay');
-            overlay.style.display = 'flex';
-            
+            const btn = document.getElementById('dl-btn');
+            const msg = document.getElementById('loading-msg');
+            btn.disabled = true;
+            msg.style.display = 'block';
+
             const cert = document.getElementById('cert-wrap');
             cert.style.display = 'block';
 
-            // Essential: Wait for browser to actually paint the Base64 images
-            await new Promise(r => setTimeout(r, 1000));
+            // FORCE WAIT: Gives the browser time to finish rendering Base64
+            await new Promise(resolve => setTimeout(resolve, 2000));
 
-            html2canvas(cert, { 
-                scale: 2, 
-                useCORS: true, 
-                logging: false,
+            html2canvas(cert, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true, // Crucial for local file previews
                 backgroundColor: "#fffcf9"
             }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = 'Marriage_License.png';
+                link.download = 'Our_Union_Certificate.png';
                 link.href = canvas.toDataURL("image/png");
                 link.click();
                 
                 cert.style.display = 'none';
-                overlay.style.display = 'none';
+                btn.disabled = false;
+                msg.style.display = 'none';
+            }).catch(err => {
+                alert("Error generating image. Try a smaller photo file.");
+                console.error(err);
             });
         }
     </script>
