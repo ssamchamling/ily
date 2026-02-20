@@ -12,222 +12,119 @@
 
     <style>
         :root { --pink: #fdf2f4; --rose: #9d4658; --gold: #c5a059; --white: #ffffff; }
-        
         body { background-color: var(--pink); font-family: 'Montserrat', sans-serif; margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-
         .page { display: none; width: 90%; max-width: 500px; background: var(--white); padding: 40px; border-radius: 30px; text-align: center; box-shadow: 0 15px 50px rgba(157, 70, 88, 0.1); box-sizing: border-box; }
-        .active { display: block !important; animation: slideUp 0.6s ease-out; }
-
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-
+        .active { display: block !important; }
         h1 { font-family: 'Monsieur La Doulaise', cursive; font-size: 3.5rem; color: var(--rose); margin: 0; }
         h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: var(--gold); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 20px; }
+        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #eee; border-radius: 10px; box-sizing: border-box; background: #fafafa; }
+        .btn { background: var(--rose); color: white; border: none; padding: 16px 30px; border-radius: 50px; cursor: pointer; width: 100%; font-weight: 600; margin-top: 10px; }
         
-        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #f0f0f0; border-radius: 10px; box-sizing: border-box; background: #fafafa; font-family: inherit; }
-
-        .btn { background: var(--rose); color: white; border: none; padding: 16px 30px; border-radius: 50px; cursor: pointer; width: 100%; font-weight: 600; margin-top: 10px; transition: 0.3s; }
-        .btn:hover { background: var(--gold); }
-
-        .upload-section { text-align: left; margin-top: 15px; }
-        .upload-label { font-size: 0.7rem; font-weight: bold; color: var(--rose); display: block; margin-bottom: 5px; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-
-        /* Certificate Layout */
-        #cert-wrap { width: 1000px; height: 750px; background: #fffcf9; border: 15px double var(--gold); padding: 30px; display: none; position: absolute; left: -9999px; box-sizing: border-box; }
-        .cert-inner { border: 2px solid var(--gold); height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 50px; box-sizing: border-box; background: white; }
-        
-        .cert-main-row { display: flex; align-items: center; justify-content: space-between; width: 100%; }
-        .frame { width: 180px; height: 180px; border-radius: 50%; background: #f0f0f0; overflow: hidden; border: 4px solid var(--white); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        /* THE SECRET FIX: This keeps the certificate "active" but hidden from view */
+        #cert-wrap { 
+            width: 800px; height: 600px; background: #fffcf9; border: 12px double var(--gold); 
+            padding: 20px; box-sizing: border-box; position: absolute; top: -5000px; left: -5000px;
+        }
+        .cert-inner { border: 1px solid var(--gold); height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 40px; box-sizing: border-box; background: white; }
+        .cert-main-row { display: flex; align-items: center; justify-content: space-around; }
+        .frame { width: 150px; height: 150px; border-radius: 50%; background: #eee; overflow: hidden; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .frame img { width: 100%; height: 100%; object-fit: cover; }
-
-        .cert-text { text-align: center; flex: 1; padding: 0 30px; }
-        #final-vows { font-family: 'Cormorant Garamond', serif; font-style: italic; color: #555; line-height: 1.6; }
-
-        .sig-container { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; margin-top: 40px; }
-        .sig-box { text-align: center; width: 250px; }
-        .sig-box img { max-width: 200px; max-height: 80px; filter: contrast(1.5) grayscale(1); mix-blend-mode: multiply; }
-        .sig-line { border-top: 1px solid var(--gold); margin-top: 10px; font-size: 0.8rem; color: var(--gold); text-transform: uppercase; padding-top: 5px; }
-
-        #loading-msg { display: none; color: var(--rose); font-weight: bold; margin-top: 10px; }
+        .sig-box img { max-width: 150px; max-height: 60px; filter: grayscale(1) contrast(1.2); mix-blend-mode: multiply; }
+        
+        /* Preview container on Page 6 */
+        #preview-container { width: 100%; height: 200px; border: 1px dashed var(--gold); margin: 20px 0; display: flex; align-items: center; justify-content: center; background: #fffcf9; overflow: hidden; border-radius: 10px; }
+        #preview-container canvas { max-width: 100%; max-height: 100%; }
     </style>
 </head>
 <body>
 
-    <div id="p1" class="page active">
-        <h1>Welcome</h1>
-        <h2>Aura of Love</h2>
-        <button class="btn" onclick="showPage('p2')">Start Journey</button>
-    </div>
-
-    <div id="p2" class="page">
+    <div id="p2" class="page active">
         <h2>The Couple</h2>
-        <input type="text" id="name1" placeholder="Your Full Name">
-        <input type="text" id="name2" placeholder="Partner's Full Name">
-        <input type="email" id="myEmail" placeholder="Your Email">
-        
-        <div class="upload-section">
-            <span class="upload-label">Profile Photos</span>
-            <div class="grid-2">
-                <input type="file" accept="image/*" onchange="preview(this, 'v1')">
-                <input type="file" accept="image/*" onchange="preview(this, 'v2')">
+        <input type="text" id="name1" placeholder="Your Name">
+        <input type="text" id="name2" placeholder="Partner's Name">
+        <div style="text-align:left; font-size: 0.7rem; margin-top: 10px;">
+            <b>Upload Photos (Keep under 2MB):</b>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:5px;">
+                <input type="file" onchange="preview(this, 'v1')">
+                <input type="file" onchange="preview(this, 'v2')">
             </div>
-            <span class="upload-label">Signatures (Paper Photo)</span>
-            <div class="grid-2">
-                <input type="file" accept="image/*" onchange="preview(this, 'sig1')">
-                <input type="file" accept="image/*" onchange="preview(this, 'sig2')">
+            <b>Signatures:</b>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:5px;">
+                <input type="file" onchange="preview(this, 'sig1')">
+                <input type="file" onchange="preview(this, 'sig2')">
             </div>
         </div>
-        <button class="btn" onclick="showPage('p3')">Next</button>
-    </div>
-
-    <div id="p3" class="page">
-        <h2>Your Vows</h2>
-        <textarea id="proposalMsg" rows="5" placeholder="Share your heartfelt message..."></textarea>
-        <button class="btn" onclick="showPage('p4')">Next</button>
-    </div>
-
-    <div id="p4" class="page">
-        <h2>Finish & Send</h2>
-        <input type="email" id="email2" placeholder="Partner's Email">
-        <button class="btn" onclick="sendProposal()">Send to Partner</button>
-    </div>
-
-    <div id="p-waiting" class="page">
-        <h1>Sent! ❤️</h1>
-        <p>Awaiting partner signature...</p>
-    </div>
-
-    <div id="p5" class="page">
-        <h1>Accept Proposal</h1>
-        <p id="proposal-display" style="font-style: italic;"></p>
-        <textarea id="vows" rows="4" placeholder="Your vows..."></textarea>
-        <button class="btn" onclick="partnerAccepts()">Sign & Accept ❤️</button>
+        <button class="btn" onclick="finishSetup()">Next</button>
     </div>
 
     <div id="p6" class="page">
-        <h1>Official!</h1>
-        <p>Your certificate is ready.</p>
-        <button class="btn" id="dl-btn" onclick="download()">Download PNG</button>
-        <div id="loading-msg">Processing image... Please wait.</div>
+        <h1>Review</h1>
+        <p>If you see your photos in the box below, you are ready to download!</p>
+        <div id="preview-container">
+            <span id="load-text">Generating Preview...</span>
+        </div>
+        <button class="btn" onclick="download()">Download Official PNG</button>
     </div>
 
     <div id="cert-wrap">
         <div class="cert-inner">
-            <div style="text-align: center;">
-                <p style="letter-spacing: 8px; color: var(--gold); font-size: 0.9rem; margin: 0;">ESTABLISHED IN LOVE</p>
-                <h1 style="font-size: 4.5rem; margin: 15px 0; font-family: 'Monsieur La Doulaise', cursive;">Marriage License</h1>
+            <div style="text-align:center;">
+                <h1>Marriage License</h1>
             </div>
-
             <div class="cert-main-row">
                 <div class="frame"><img id="v1" src=""></div>
-                <div class="cert-text">
-                    <h2 id="final-names" style="font-size: 2.5rem; color: #333; margin-bottom: 20px;"></h2>
-                    <p id="final-vows"></p>
+                <div style="text-align:center; flex:1;">
+                    <h2 id="final-names"></h2>
+                    <p>UNITED IN LOVE</p>
                 </div>
                 <div class="frame"><img id="v2" src=""></div>
             </div>
-
-            <div style="text-align: center; margin-top: 30px;">
-                <div style="font-family: 'Monsieur La Doulaise', cursive; font-size: 3rem; color: var(--rose);">Infinite Love</div>
-            </div>
-
-            <div class="sig-container">
-                <div class="sig-box">
-                    <img id="sig1" src="">
-                    <div class="sig-line" id="sig-label-1">SIGNATURE</div>
-                </div>
-                <div class="sig-box">
-                    <img id="sig2" src="">
-                    <div class="sig-line" id="sig-label-2">SIGNATURE</div>
-                </div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                <div class="sig-box"><img id="sig1" src=""><div style="border-top:1px solid #c5a059; font-size:10px;">SIGNATURE</div></div>
+                <div style="font-family:cursive; color:#9d4658;">Infinite Love</div>
+                <div class="sig-box"><img id="sig2" src=""><div style="border-top:1px solid #c5a059; font-size:10px;">SIGNATURE</div></div>
             </div>
         </div>
     </div>
 
     <script>
-        emailjs.init("6Esqq34VB6yAXZCB3");
-
         function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
         }
 
-        // Improved Preview: Uses modern Image object to ensure the data is loaded
         function preview(input, imgId) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = document.getElementById(imgId);
-                    img.src = e.target.result;
+                reader.onload = e => {
+                    document.getElementById(imgId).src = e.target.result;
                 };
                 reader.readAsDataURL(input.files[0]);
             }
         }
 
-        function sendProposal() {
-            const n1 = document.getElementById('name1').value;
-            const n2 = document.getElementById('name2').value;
-            const myEmail = document.getElementById('myEmail').value;
-            const msg = document.getElementById('proposalMsg').value;
-            const email2 = document.getElementById('email2').value;
-            const pLink = `${window.location.origin}${window.location.pathname}?partner=true&n1=${encodeURIComponent(n1)}&n2=${encodeURIComponent(n2)}&msg=${encodeURIComponent(msg)}&owner=${encodeURIComponent(myEmail)}`;
-
-            emailjs.send("service_ip92c2u", "template_rq2ywdn", {
-                to_email: email2, from_name: n1, to_name: n2, message: msg, link: pLink
-            }).then(() => showPage('p-waiting'));
-        }
-
-        window.onload = function() {
-            const params = new URLSearchParams(window.location.search);
-            if (params.get('partner') === 'true') {
-                document.getElementById('name1').value = params.get('n1');
-                document.getElementById('name2').value = params.get('n2');
-                document.getElementById('proposal-display').innerText = params.get('msg');
-                showPage('p5');
-            }
-        };
-
-        function partnerAccepts() {
-            const params = new URLSearchParams(window.location.search);
-            const partnerVows = document.getElementById('vows').value;
-
-            document.getElementById('final-names').innerText = `${params.get('n1')} & ${params.get('n2')}`;
-            document.getElementById('final-vows').innerText = partnerVows || params.get('msg');
-            document.getElementById('sig-label-1').innerText = params.get('n1');
-            document.getElementById('sig-label-2').innerText = params.get('n2');
-            
+        function finishSetup() {
+            document.getElementById('final-names').innerText = document.getElementById('name1').value + " & " + document.getElementById('name2').value;
             showPage('p6');
+            generatePreview();
         }
 
-        async function download() {
-            const btn = document.getElementById('dl-btn');
-            const msg = document.getElementById('loading-msg');
-            btn.disabled = true;
-            msg.style.display = 'block';
-
+        function generatePreview() {
             const cert = document.getElementById('cert-wrap');
-            cert.style.display = 'block';
+            html2canvas(cert, { scale: 0.5, useCORS: true }).then(canvas => {
+                const container = document.getElementById('preview-container');
+                container.innerHTML = "";
+                container.appendChild(canvas);
+            });
+        }
 
-            // FORCE WAIT: Gives the browser time to finish rendering Base64
-            await new Promise(resolve => setTimeout(resolve, 2000));
-
-            html2canvas(cert, {
-                scale: 2,
-                useCORS: true,
-                allowTaint: true, // Crucial for local file previews
-                backgroundColor: "#fffcf9"
-            }).then(canvas => {
+        function download() {
+            const cert = document.getElementById('cert-wrap');
+            html2canvas(cert, { scale: 2, useCORS: true }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = 'Our_Union_Certificate.png';
+                link.download = 'Union_Certificate.png';
                 link.href = canvas.toDataURL("image/png");
                 link.click();
-                
-                cert.style.display = 'none';
-                btn.disabled = false;
-                msg.style.display = 'none';
-            }).catch(err => {
-                alert("Error generating image. Try a smaller photo file.");
-                console.error(err);
             });
         }
     </script>
