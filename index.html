@@ -8,123 +8,146 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=Monsieur+La+Doulaise&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
     <style>
         :root { --pink: #fdf2f4; --rose: #9d4658; --gold: #c5a059; --white: #ffffff; }
         body { background-color: var(--pink); font-family: 'Montserrat', sans-serif; margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        
         .page { display: none; width: 90%; max-width: 500px; background: var(--white); padding: 40px; border-radius: 30px; text-align: center; box-shadow: 0 15px 50px rgba(157, 70, 88, 0.1); box-sizing: border-box; }
         .active { display: block !important; }
-        h1 { font-family: 'Monsieur La Doulaise', cursive; font-size: 3.5rem; color: var(--rose); margin: 0; }
-        h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: var(--gold); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 20px; }
-        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #eee; border-radius: 10px; box-sizing: border-box; background: #fafafa; }
-        .btn { background: var(--rose); color: white; border: none; padding: 16px 30px; border-radius: 50px; cursor: pointer; width: 100%; font-weight: 600; margin-top: 10px; }
         
-        /* THE SECRET FIX: This keeps the certificate "active" but hidden from view */
+        h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: var(--gold); text-transform: uppercase; letter-spacing: 3px; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #eee; border-radius: 10px; box-sizing: border-box; background: #fafafa; }
+        .btn { background: var(--rose); color: white; border: none; padding: 16px 30px; border-radius: 50px; cursor: pointer; width: 100%; font-weight: 600; margin-top: 15px; }
+
+        .upload-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .thumb-preview { width: 100%; height: 60px; border-radius: 8px; border: 1px dashed #ccc; margin-top: 5px; object-fit: cover; background: #f9f9f9; display: block; }
+
+        /* Hidden Certificate - Fixed Size for PNG */
         #cert-wrap { 
             width: 800px; height: 600px; background: #fffcf9; border: 12px double var(--gold); 
-            padding: 20px; box-sizing: border-box; position: absolute; top: -5000px; left: -5000px;
+            padding: 20px; box-sizing: border-box; position: absolute; top: -9999px; left: -9999px;
         }
-        .cert-inner { border: 1px solid var(--gold); height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 40px; box-sizing: border-box; background: white; }
-        .cert-main-row { display: flex; align-items: center; justify-content: space-around; }
-        .frame { width: 150px; height: 150px; border-radius: 50%; background: #eee; overflow: hidden; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .cert-inner { border: 1px solid var(--gold); height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 40px; box-sizing: border-box; background: white; text-align: center; }
+        .cert-main-row { display: flex; align-items: center; justify-content: space-between; margin: 20px 0; }
+        .frame { width: 160px; height: 160px; border-radius: 50%; background: #eee; overflow: hidden; border: 4px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .frame img { width: 100%; height: 100%; object-fit: cover; }
-        .sig-box img { max-width: 150px; max-height: 60px; filter: grayscale(1) contrast(1.2); mix-blend-mode: multiply; }
         
-        /* Preview container on Page 6 */
-        #preview-container { width: 100%; height: 200px; border: 1px dashed var(--gold); margin: 20px 0; display: flex; align-items: center; justify-content: center; background: #fffcf9; overflow: hidden; border-radius: 10px; }
-        #preview-container canvas { max-width: 100%; max-height: 100%; }
+        .sig-row { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; }
+        .sig-box { width: 200px; text-align: center; }
+        .sig-box img { max-width: 160px; max-height: 70px; mix-blend-mode: multiply; }
+        .sig-line { border-top: 1px solid var(--gold); margin-top: 5px; font-size: 10px; color: var(--gold); text-transform: uppercase; }
     </style>
 </head>
 <body>
 
     <div id="p2" class="page active">
         <h2>The Couple</h2>
-        <input type="text" id="name1" placeholder="Your Name">
-        <input type="text" id="name2" placeholder="Partner's Name">
-        <div style="text-align:left; font-size: 0.7rem; margin-top: 10px;">
-            <b>Upload Photos (Keep under 2MB):</b>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:5px;">
-                <input type="file" onchange="preview(this, 'v1')">
-                <input type="file" onchange="preview(this, 'v2')">
+        <input type="text" id="n1" placeholder="Your Name">
+        <input type="text" id="n2" placeholder="Partner's Name">
+        
+        <p style="font-size: 11px; color: var(--rose); margin-bottom: 5px;">PHOTOS & SIGNATURES</p>
+        
+        <div class="upload-row">
+            <div>
+                <input type="file" id="f1" accept="image/*" onchange="processImage(this, 'v1', 'pre1')">
+                <img id="pre1" class="thumb-preview">
             </div>
-            <b>Signatures:</b>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:5px;">
-                <input type="file" onchange="preview(this, 'sig1')">
-                <input type="file" onchange="preview(this, 'sig2')">
+            <div>
+                <input type="file" id="f2" accept="image/*" onchange="processImage(this, 'v2', 'pre2')">
+                <img id="pre2" class="thumb-preview">
             </div>
         </div>
-        <button class="btn" onclick="finishSetup()">Next</button>
+
+        <div class="upload-row">
+            <div>
+                <input type="file" id="s1" accept="image/*" onchange="processImage(this, 'sig1', 'pre3')">
+                <img id="pre3" class="thumb-preview">
+            </div>
+            <div>
+                <input type="file" id="s2" accept="image/*" onchange="processImage(this, 'sig2', 'pre4')">
+                <img id="pre4" class="thumb-preview">
+            </div>
+        </div>
+
+        <button class="btn" onclick="goToFinish()">Create Certificate</button>
     </div>
 
     <div id="p6" class="page">
-        <h1>Review</h1>
-        <p>If you see your photos in the box below, you are ready to download!</p>
-        <div id="preview-container">
-            <span id="load-text">Generating Preview...</span>
-        </div>
-        <button class="btn" onclick="download()">Download Official PNG</button>
+        <h1>Ready!</h1>
+        <p>Your photos and signatures are locked in.</p>
+        <button class="btn" onclick="downloadCert()">Download Official PNG</button>
     </div>
 
     <div id="cert-wrap">
         <div class="cert-inner">
-            <div style="text-align:center;">
-                <h1>Marriage License</h1>
+            <div>
+                <p style="letter-spacing: 5px; color: var(--gold); font-size: 10px; margin: 0;">ESTABLISHED IN LOVE</p>
+                <h1 style="font-family: 'Monsieur La Doulaise', cursive; font-size: 4rem; margin: 10px 0; color: var(--rose);">Marriage License</h1>
             </div>
+
             <div class="cert-main-row">
-                <div class="frame"><img id="v1" src=""></div>
-                <div style="text-align:center; flex:1;">
-                    <h2 id="final-names"></h2>
-                    <p>UNITED IN LOVE</p>
+                <div class="frame"><img id="v1"></div>
+                <div style="flex: 1; padding: 0 20px;">
+                    <h2 id="disp-names" style="font-size: 2rem; color: #333; margin: 0;"></h2>
+                    <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 14px; color: #666; margin-top: 15px;">
+                        I choose you, every click, every scroll, and every notification of love, for now, for always, and forever in our little online world.
+                    </p>
                 </div>
-                <div class="frame"><img id="v2" src=""></div>
+                <div class="frame"><img id="v2"></div>
             </div>
-            <div style="display:flex; justify-content:space-between; align-items:flex-end;">
-                <div class="sig-box"><img id="sig1" src=""><div style="border-top:1px solid #c5a059; font-size:10px;">SIGNATURE</div></div>
-                <div style="font-family:cursive; color:#9d4658;">Infinite Love</div>
-                <div class="sig-box"><img id="sig2" src=""><div style="border-top:1px solid #c5a059; font-size:10px;">SIGNATURE</div></div>
+
+            <div style="font-family: 'Monsieur La Doulaise', cursive; font-size: 2.5rem; color: var(--rose);">Infinite Love</div>
+
+            <div class="sig-row">
+                <div class="sig-box">
+                    <img id="sig1">
+                    <div class="sig-line" id="lbl1">SIGNATURE</div>
+                </div>
+                <div class="sig-box">
+                    <img id="sig2">
+                    <div class="sig-line" id="lbl2">SIGNATURE</div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        function showPage(id) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-        }
-
-        function preview(input, imgId) {
+        // CRITICAL: This ensures images are treated as data, not files
+        function processImage(input, targetId, thumbId) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
-                reader.onload = e => {
-                    document.getElementById(imgId).src = e.target.result;
+                reader.onload = function(e) {
+                    const dataUrl = e.target.result;
+                    document.getElementById(targetId).src = dataUrl;
+                    document.getElementById(thumbId).src = dataUrl;
                 };
                 reader.readAsDataURL(input.files[0]);
             }
         }
 
-        function finishSetup() {
-            document.getElementById('final-names').innerText = document.getElementById('name1').value + " & " + document.getElementById('name2').value;
-            showPage('p6');
-            generatePreview();
+        function goToFinish() {
+            document.getElementById('disp-names').innerText = document.getElementById('n1').value + " & " + document.getElementById('n2').value;
+            document.getElementById('lbl1').innerText = document.getElementById('n1').value;
+            document.getElementById('lbl2').innerText = document.getElementById('n2').value;
+            document.getElementById('p2').style.display = 'none';
+            document.getElementById('p6').style.display = 'block';
         }
 
-        function generatePreview() {
+        async function downloadCert() {
             const cert = document.getElementById('cert-wrap');
-            html2canvas(cert, { scale: 0.5, useCORS: true }).then(canvas => {
-                const container = document.getElementById('preview-container');
-                container.innerHTML = "";
-                container.appendChild(canvas);
-            });
-        }
+            cert.style.top = "0"; // Bring into view briefly for capture
+            cert.style.left = "0";
+            
+            // Wait 1 second for the browser to "paint" the images
+            await new Promise(r => setTimeout(r, 1000));
 
-        function download() {
-            const cert = document.getElementById('cert-wrap');
             html2canvas(cert, { scale: 2, useCORS: true }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = 'Union_Certificate.png';
+                link.download = 'Our_Union_Certificate.png';
                 link.href = canvas.toDataURL("image/png");
                 link.click();
+                cert.style.top = "-9999px"; // Hide again
             });
         }
     </script>
