@@ -6,7 +6,6 @@
     <title>Aura of Love | Digital Union</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=Monsieur+La+Doulaise&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
@@ -20,63 +19,67 @@
         input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #eee; border-radius: 10px; box-sizing: border-box; background: #fafafa; }
         .btn { background: var(--rose); color: white; border: none; padding: 16px 30px; border-radius: 50px; cursor: pointer; width: 100%; font-weight: 600; margin-top: 15px; }
 
-        .upload-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .thumb-preview { width: 100%; height: 60px; border-radius: 8px; border: 1px dashed #ccc; margin-top: 5px; object-fit: cover; background: #f9f9f9; display: block; }
+        /* Small previews to confirm upload */
+        .preview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+        .thumb { width: 100%; height: 80px; border-radius: 10px; object-fit: cover; background: #f0f0f0; border: 1px solid #ddd; }
+        .sig-thumb { object-fit: contain; background: white; }
 
-        /* Hidden Certificate - Fixed Size for PNG */
+        /* The Certificate - Locked for High Quality */
         #cert-wrap { 
             width: 800px; height: 600px; background: #fffcf9; border: 12px double var(--gold); 
-            padding: 20px; box-sizing: border-box; position: absolute; top: -9999px; left: -9999px;
+            padding: 20px; box-sizing: border-box; position: fixed; top: 0; left: 0; 
+            z-index: -100; opacity: 0.01; pointer-events: none;
         }
         .cert-inner { border: 1px solid var(--gold); height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 40px; box-sizing: border-box; background: white; text-align: center; }
         .cert-main-row { display: flex; align-items: center; justify-content: space-between; margin: 20px 0; }
         .frame { width: 160px; height: 160px; border-radius: 50%; background: #eee; overflow: hidden; border: 4px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .frame img { width: 100%; height: 100%; object-fit: cover; }
         
-        .sig-row { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; }
+        .sig-row { display: flex; justify-content: space-between; align-items: flex-end; }
         .sig-box { width: 200px; text-align: center; }
-        .sig-box img { max-width: 160px; max-height: 70px; mix-blend-mode: multiply; }
-        .sig-line { border-top: 1px solid var(--gold); margin-top: 5px; font-size: 10px; color: var(--gold); text-transform: uppercase; }
+        .sig-box img { max-width: 160px; max-height: 70px; }
+        .sig-line { border-top: 1px solid var(--gold); margin-top: 5px; font-size: 10px; color: var(--gold); }
     </style>
 </head>
 <body>
 
     <div id="p2" class="page active">
         <h2>The Couple</h2>
-        <input type="text" id="n1" placeholder="Your Name">
-        <input type="text" id="n2" placeholder="Partner's Name">
+        <input type="text" id="name1" placeholder="First Name">
+        <input type="text" id="name2" placeholder="Second Name">
         
-        <p style="font-size: 11px; color: var(--rose); margin-bottom: 5px;">PHOTOS & SIGNATURES</p>
-        
-        <div class="upload-row">
+        <p style="font-size: 10px; color: var(--rose); margin: 15px 0 5px;">UPLOAD PHOTOS</p>
+        <div class="preview-grid">
             <div>
-                <input type="file" id="f1" accept="image/*" onchange="processImage(this, 'v1', 'pre1')">
-                <img id="pre1" class="thumb-preview">
+                <input type="file" accept="image/*" onchange="forceLoad(this, 'v1', 'pre1')">
+                <img id="pre1" class="thumb">
             </div>
             <div>
-                <input type="file" id="f2" accept="image/*" onchange="processImage(this, 'v2', 'pre2')">
-                <img id="pre2" class="thumb-preview">
+                <input type="file" accept="image/*" onchange="forceLoad(this, 'v2', 'pre2')">
+                <img id="pre2" class="thumb">
             </div>
         </div>
 
-        <div class="upload-row">
+        <p style="font-size: 10px; color: var(--rose); margin: 15px 0 5px;">SIGNATURE PHOTOS</p>
+        <div class="preview-grid">
             <div>
-                <input type="file" id="s1" accept="image/*" onchange="processImage(this, 'sig1', 'pre3')">
-                <img id="pre3" class="thumb-preview">
+                <input type="file" accept="image/*" onchange="forceLoad(this, 'sig1', 'pre3')">
+                <img id="pre3" class="thumb sig-thumb">
             </div>
             <div>
-                <input type="file" id="s2" accept="image/*" onchange="processImage(this, 'sig2', 'pre4')">
-                <img id="pre4" class="thumb-preview">
+                <input type="file" accept="image/*" onchange="forceLoad(this, 'sig2', 'pre4')">
+                <img id="pre4" class="thumb sig-thumb">
             </div>
         </div>
 
-        <button class="btn" onclick="goToFinish()">Create Certificate</button>
+        <button class="btn" onclick="goToFinish()">Review Certificate</button>
     </div>
 
     <div id="p6" class="page">
-        <h1>Ready!</h1>
-        <p>Your photos and signatures are locked in.</p>
-        <button class="btn" onclick="downloadCert()">Download Official PNG</button>
+        <h1>Official!</h1>
+        <p>Your photos are locked into the license.</p>
+        <button class="btn" onclick="download()">Download Official PNG</button>
+        <p style="font-size: 11px; margin-top: 10px; color: #888;">Wait 2 seconds after clicking for high-quality rendering.</p>
     </div>
 
     <div id="cert-wrap">
@@ -89,7 +92,7 @@
             <div class="cert-main-row">
                 <div class="frame"><img id="v1"></div>
                 <div style="flex: 1; padding: 0 20px;">
-                    <h2 id="disp-names" style="font-size: 2rem; color: #333; margin: 0;"></h2>
+                    <h2 id="final-names" style="font-size: 2rem; color: #333; margin: 0;"></h2>
                     <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 14px; color: #666; margin-top: 15px;">
                         I choose you, every click, every scroll, and every notification of love, for now, for always, and forever in our little online world.
                     </p>
@@ -102,52 +105,56 @@
             <div class="sig-row">
                 <div class="sig-box">
                     <img id="sig1">
-                    <div class="sig-line" id="lbl1">SIGNATURE</div>
+                    <div class="sig-line" id="ln1">SIGNATURE</div>
                 </div>
                 <div class="sig-box">
                     <img id="sig2">
-                    <div class="sig-line" id="lbl2">SIGNATURE</div>
+                    <div class="sig-line" id="ln2">SIGNATURE</div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // CRITICAL: This ensures images are treated as data, not files
-        function processImage(input, targetId, thumbId) {
+        // THIS IS THE FIX: Forces images to be stored as Data strings
+        function forceLoad(input, targetId, thumbId) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const dataUrl = e.target.result;
-                    document.getElementById(targetId).src = dataUrl;
-                    document.getElementById(thumbId).src = dataUrl;
+                    const imgData = e.target.result;
+                    document.getElementById(targetId).src = imgData;
+                    document.getElementById(thumbId).src = imgData;
                 };
                 reader.readAsDataURL(input.files[0]);
             }
         }
 
         function goToFinish() {
-            document.getElementById('disp-names').innerText = document.getElementById('n1').value + " & " + document.getElementById('n2').value;
-            document.getElementById('lbl1').innerText = document.getElementById('n1').value;
-            document.getElementById('lbl2').innerText = document.getElementById('n2').value;
+            const n1 = document.getElementById('name1').value;
+            const n2 = document.getElementById('name2').value;
+            document.getElementById('final-names').innerText = n1 + " & " + n2;
+            document.getElementById('ln1').innerText = n1.toUpperCase();
+            document.getElementById('ln2').innerText = n2.toUpperCase();
+            
             document.getElementById('p2').style.display = 'none';
             document.getElementById('p6').style.display = 'block';
         }
 
-        async function downloadCert() {
+        async function download() {
             const cert = document.getElementById('cert-wrap');
-            cert.style.top = "0"; // Bring into view briefly for capture
-            cert.style.left = "0";
-            
-            // Wait 1 second for the browser to "paint" the images
+            // Give the browser 1 second to "warm up" the canvas
             await new Promise(r => setTimeout(r, 1000));
 
-            html2canvas(cert, { scale: 2, useCORS: true }).then(canvas => {
+            html2canvas(cert, { 
+                scale: 3, // Super high resolution
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: "#fffcf9"
+            }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = 'Our_Union_Certificate.png';
+                link.download = 'Our_Digital_Union.png';
                 link.href = canvas.toDataURL("image/png");
                 link.click();
-                cert.style.top = "-9999px"; // Hide again
             });
         }
     </script>
